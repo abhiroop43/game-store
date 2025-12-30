@@ -5,16 +5,18 @@
 
 @if (_genres is null)
 {
-    <p><em>Loading...</em></p>
+    <p>
+        <em>Loading...</em>
+    </p>
 }
 else
 {
     <div class="row justify-content-md-center">
         <div class="col-md-4">
-            <EditForm Model="@Game" FormName="editGame">
+            <EditForm Model="@Game" FormName="editGame" OnSubmit="HandleSubmit">
                 <div class="mb-3">
                     <label for="name" class="form-label">Name:</label>
-                    <InputText class="form-control" id="name" @bind-value="Game.Name" />
+                    <InputText class="form-control" id="name" @bind-value="Game.Name"/>
                 </div>
                 <div class="mb-3">
                     <label for="genre" class="form-label">Genre:</label>
@@ -28,11 +30,11 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="price" class="form-label">Price:</label>
-                    <InputNumber class="form-control" id="price" @bind-value="Game.Price" />
+                    <InputNumber step=".01" class="form-control" id="price" @bind-value="Game.Price"/>
                 </div>
                 <div class="mb-3">
                     <label for="releaseDate" class="form-label">Release Date:</label>
-                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate" />
+                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate"/>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </EditForm>
@@ -41,9 +43,8 @@ else
 }
 
 
-
-
 @code {
+    [SupplyParameterFromForm]
     private GameDetails Game { get; set; } = new()
     {
         Name = "DOOM",
@@ -53,6 +54,7 @@ else
     };
 
     private readonly GenresClient _genresClient = new();
+    private readonly GamesClient _gamesClient = new();
     private Genre[]? _genres;
 
     protected override void OnInitialized()
@@ -60,4 +62,10 @@ else
         _genres = _genresClient.GetGenres();
         base.OnInitialized();
     }
+
+    private void HandleSubmit()
+    {
+        _gamesClient.AddGame(Game);
+    }
+
 }

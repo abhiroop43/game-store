@@ -2,7 +2,7 @@
 
 namespace GameStore.Frontend.Clients;
 
-public class GameClients
+public class GamesClient
 {
     private readonly List<GameSummary> _games =
     [
@@ -32,5 +32,21 @@ public class GameClients
         },
     ];
 
+    private readonly Genre[] genres = new GenresClient().GetGenres();
+
     public GameSummary[] GetGames() => [.. _games];
+
+    public void AddGame(GameDetails game)
+    {
+        var genre = genres.FirstOrDefault(g => g.Id == game.GenreId);
+        var gameSummary = new GameSummary
+        {
+            Id = _games.Count + 1,
+            Name = game.Name,
+            Genre = genre != null ? genre.Name : "Unknown",
+            Price = game.Price,
+            ReleaseDate = game.ReleaseDate,
+        };
+        _games.Add(gameSummary);
+    }
 }
