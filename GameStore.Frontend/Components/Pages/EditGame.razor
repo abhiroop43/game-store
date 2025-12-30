@@ -1,0 +1,63 @@
+﻿@page "/edit-game"
+
+<PageTitle>New Gate</PageTitle>
+<h3>New Game</h3>
+
+@if (_genres is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row justify-content-md-center">
+        <div class="col-md-4">
+            <EditForm Model="@Game" FormName="editGame">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText class="form-control" id="name" @bind-value="Game.Name" />
+                </div>
+                <div class="mb-3">
+                    <label for="genre" class="form-label">Genre:</label>
+                    <InputSelect class="form-control" id="genre" @bind-value="Game.GenreId">
+                        <option value="">Select a Genre</option>
+                        @foreach (var genre in _genres)
+                        {
+                            <option value="@genre.Id">@genre.Name</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber class="form-control" id="price" @bind-value="Game.Price" />
+                </div>
+                <div class="mb-3">
+                    <label for="releaseDate" class="form-label">Release Date:</label>
+                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate" />
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+
+
+@code {
+    private GameDetails Game { get; set; } = new()
+    {
+        Name = "DOOM",
+        GenreId = 4,
+        Price = 59.99m,
+        ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow),
+    };
+
+    private readonly GenresClient _genresClient = new();
+    private Genre[]? _genres;
+
+    protected override void OnInitialized()
+    {
+        _genres = _genresClient.GetGenres();
+        base.OnInitialized();
+    }
+}
