@@ -49,4 +49,27 @@ public class GamesClient
         };
         _games.Add(gameSummary);
     }
+
+    public GameDetails GetGameById(int id)
+    {
+        var game = _games.Find(g => g.Id == id);
+
+        if (game == null)
+        {
+            return null!;
+        }
+
+        var genre = genres.FirstOrDefault(g =>
+            string.Equals(g.Name, game.Genre, StringComparison.OrdinalIgnoreCase)
+        );
+
+        return new GameDetails
+        {
+            Id = game.Id,
+            Name = game.Name,
+            GenreId = genre?.Id,
+            Price = game.Price,
+            ReleaseDate = game.ReleaseDate,
+        };
+    }
 }

@@ -16,10 +16,13 @@ else
 {
     <div class="row justify-content-md-center">
         <div class="col-md-4">
-            <EditForm Model="@Game" FormName="editGame" OnSubmit="HandleSubmit">
+            <EditForm Model="@Game" FormName="editGame" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
                 <div class="mb-3">
                     <label for="name" class="form-label">Name:</label>
                     <InputText class="form-control" id="name" @bind-value="Game.Name" />
+                    <ValidationMessage For="@(() => Game.Name)" />
                 </div>
                 <div class="mb-3">
                     <label for="genre" class="form-label">Genre:</label>
@@ -34,11 +37,17 @@ else
                 <div class="mb-3">
                     <label for="price" class="form-label">Price:</label>
                     <InputNumber step=".01" class="form-control" id="price" @bind-value="Game.Price" />
+                    <ValidationMessage For="@(() => Game.Price)" />
                 </div>
                 <div class="mb-3">
                     <label for="releaseDate" class="form-label">Release Date:</label>
                     <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate" />
                 </div>
+
+                <div class="mb-3">
+                    <ValidationSummary />
+                </div>
+
                 <button type="submit" class="btn btn-primary">Submit</button>
                 <a role="button" class="btn btn-secondary" href="/">Cancel</a>
             </EditForm>
