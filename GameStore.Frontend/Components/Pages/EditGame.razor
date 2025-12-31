@@ -1,12 +1,14 @@
 ﻿@page "/edit-game"
+@page "/edit-game/{id:int}"
+
 @inject NavigationManager NavigationManager
 @inject GamesClient GamesClient
 @inject GenresClient GenresClient
 
-<PageTitle>New Game</PageTitle>
-<h3>New Game</h3>
+<PageTitle>@Title</PageTitle>
+<h3>@Title</h3>
 
-@if (_genres is null)
+@if (_genres is null || Game is null)
 {
     <p>
         <em>Loading...</em>
@@ -17,12 +19,12 @@ else
     <div class="row justify-content-md-center">
         <div class="col-md-4">
             <EditForm Model="@Game" FormName="editGame" OnValidSubmit="HandleSubmit">
-                <DataAnnotationsValidator />
+                <DataAnnotationsValidator/>
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Name:</label>
-                    <InputText class="form-control" id="name" @bind-value="Game.Name" />
-                    <ValidationMessage For="@(() => Game.Name)" />
+                    <InputText class="form-control" id="name" @bind-value="Game.Name"/>
+                    <ValidationMessage For="@(() => Game.Name)"/>
                 </div>
                 <div class="mb-3">
                     <label for="genre" class="form-label">Genre:</label>
@@ -36,16 +38,16 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="price" class="form-label">Price:</label>
-                    <InputNumber step=".01" class="form-control" id="price" @bind-value="Game.Price" />
-                    <ValidationMessage For="@(() => Game.Price)" />
+                    <InputNumber step=".01" class="form-control" id="price" @bind-value="Game.Price"/>
+                    <ValidationMessage For="@(() => Game.Price)"/>
                 </div>
                 <div class="mb-3">
                     <label for="releaseDate" class="form-label">Release Date:</label>
-                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate" />
+                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate"/>
                 </div>
 
                 <div class="mb-3">
-                    <ValidationSummary />
+                    <ValidationSummary/>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -57,16 +59,34 @@ else
 
 
 @code {
-    [SupplyParameterFromForm]
-    private GameDetails Game { get; set; } = new()
-    {
-        Name = "DOOM",
-        GenreId = 4,
-        Price = 59.99m,
-        ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow),
-    };
+    [Parameter] public int? Id { get; set; }
+
+    [SupplyParameterFromForm] private GameDetails? Game { get; set; }
+
+    public string? Title { get; set; }
 
     private Genre[]? _genres;
+
+    protected override void OnParametersSet()
+    {
+        if (Game is not null) return;
+
+        if (Id is not null)
+        {
+            Game = GamesClient.GetGameById(Id.Value);
+            Title = $"Editing {Game.Name}";
+        }
+        else
+        {
+            Game = new GameDetails
+            {
+                Name = ""
+            };
+            Title = "Add New Game";
+        }
+
+        base.OnParametersSet();
+    }
 
     protected override void OnInitialized()
     {
@@ -76,7 +96,18 @@ else
 
     private void HandleSubmit()
     {
-        GamesClient.AddGame(Game);
+        if (Game is null) return;
+
+        if (Id is null)
+        {
+            GamesClient.AddGame(Game);
+        }
+        else
+        {
+            Game.Id = Id.Value;
+            GamesClient.UpdateGame(Game);
+        }
+
         NavigationManager.NavigateTo("/");
     }
 
