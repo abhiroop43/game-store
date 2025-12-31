@@ -20,25 +20,31 @@ else
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-hover mt-2">
             <thead class="table-dark">
-            <th></th>
             <th>Name</th>
             <th>Genre</th>
             <th class="text-end">Price</th>
             <th>Release Date</th>
+            <th></th>
             </thead>
             <tbody class="table-group-divider">
             @foreach (var game in _games)
             {
                 <tr>
-                    @* <td>@game.Id</td> *@
-                    <td>
-                        <a href="/edit-game/@game.Id"><i class="bi bi-pencil-fill text-success"></i></a>
-                        <a role="button"><i class="bi bi-trash-fill text-danger"></i></a>
-                    </td>
                     <td>@game.Name</td>
                     <td>@game.Genre</td>
                     <td class="text-end">@game.Price.ToString("C2")</td>
                     <td>@game.ReleaseDate.ToString()</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/edit-game/@game.Id">
+                                <i class="bi bi-pencil-fill text-success"></i>
+                            </a>
+                            <a role="button" data-bs-toggle="modal" data-bs-target="@GetDeleteModalId(game)">
+                                <i class="bi bi-trash-fill text-danger"></i>
+                            </a>
+                            <DeleteGame Game="@game"></DeleteGame>
+                        </div>
+                    </td>
                 </tr>
             }
             </tbody>
@@ -55,4 +61,6 @@ else
         _games = GamesClient.GetGames();
         base.OnInitialized();
     }
+
+    private static string GetDeleteModalId(GameSummary game) => $"#{DeleteGame.GetModalId(game)}";
 }
