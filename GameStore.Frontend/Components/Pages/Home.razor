@@ -31,7 +31,7 @@ else
             {
                 <tr>
                     <td>@game.Name</td>
-                    <td>@game.Genre</td>
+                    <td>@game.GenreName</td>
                     <td class="text-end">@game.Price.ToString("C2")</td>
                     <td>@game.ReleaseDate.ToString()</td>
                     <td>
@@ -56,11 +56,14 @@ else
 {
     private GameSummary[]? _games;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _games = GamesClient.GetGames();
-        base.OnInitialized();
+        _games = await GamesClient.GetGamesAsync();
+        await base.OnInitializedAsync();
     }
 
-    private static string GetDeleteModalId(GameSummary game) => $"#{DeleteGame.GetModalId(game)}";
+    private static string GetDeleteModalId(GameSummary game)
+    {
+        return $"#{DeleteGame.GetModalId(game)}";
+    }
 }

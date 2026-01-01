@@ -2,7 +2,7 @@
 
 namespace GameStore.Frontend.Clients;
 
-public class GenresClient
+public class GenresClient(HttpClient client)
 {
     private readonly List<Genre> _genres =
     [
@@ -10,8 +10,11 @@ public class GenresClient
         new() { Id = 2, Name = "Racing" },
         new() { Id = 3, Name = "Puzzle" },
         new() { Id = 4, Name = "Roleplaying" },
-        new() { Id = 5, Name = "Fighting" },
+        new() { Id = 5, Name = "Fighting" }
     ];
 
-    public Genre[] GetGenres() => [.. _genres];
+    public Genre[] GetGenres()
+    {
+        return [.. _genres];
+    }
 }

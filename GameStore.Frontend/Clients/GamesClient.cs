@@ -2,7 +2,7 @@
 
 namespace GameStore.Frontend.Clients;
 
-public class GamesClient
+public class GamesClient(HttpClient client)
 {
     private readonly List<GameSummary> _games =
     [
@@ -10,7 +10,7 @@ public class GamesClient
         {
             Id = 1,
             Name = "Adventure Quest",
-            Genre = "Adventure",
+            GenreName = "Adventure",
             Price = 29.99m,
             ReleaseDate = new DateOnly(2022, 5, 15),
         },
@@ -18,7 +18,7 @@ public class GamesClient
         {
             Id = 2,
             Name = "Racing Pro",
-            Genre = "Racing",
+            GenreName = "Racing",
             Price = 49.99m,
             ReleaseDate = new DateOnly(2021, 11, 20),
         },
@@ -26,17 +26,17 @@ public class GamesClient
         {
             Id = 3,
             Name = "Puzzle Master",
-            Genre = "Puzzle",
+            GenreName = "Puzzle",
             Price = 19.99m,
             ReleaseDate = new DateOnly(2023, 2, 10),
         },
     ];
 
-    private readonly Genre[] _genres = new GenresClient().GetGenres();
+    private readonly Genre[] _genres = new GenresClient(client).GetGenres();
 
-    public GameSummary[] GetGames()
+    public async Task<GameSummary[]> GetGamesAsync()
     {
-        return [.. _games];
+        return await client.GetFromJsonAsync<GameSummary[]>("games") ?? [];
     }
 
     public void AddGame(GameDetails game)
@@ -46,7 +46,7 @@ public class GamesClient
         {
             Id = _games.Count + 1,
             Name = game.Name,
-            Genre = genre != null ? genre.Name : "Unknown",
+            GenreName = genre != null ? genre.Name : "Unknown",
             Price = game.Price,
             ReleaseDate = game.ReleaseDate,
         };
@@ -61,7 +61,7 @@ public class GamesClient
             return;
 
         existingGame.Name = game.Name;
-        existingGame.Genre = genre != null ? genre.Name : "Unknown";
+        existingGame.GenreName = genre != null ? genre.Name : "Unknown";
         existingGame.Price = game.Price;
         existingGame.ReleaseDate = game.ReleaseDate;
     }
@@ -84,7 +84,7 @@ public class GamesClient
             return null!;
 
         var genre = _genres.FirstOrDefault(g =>
-            string.Equals(g.Name, game.Genre, StringComparison.OrdinalIgnoreCase)
+            string.Equals(g.Name, game.GenreName, StringComparison.OrdinalIgnoreCase)
         );
 
         return new GameDetails
