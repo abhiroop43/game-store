@@ -19,13 +19,13 @@ else
 {
     <div class="row justify-content-md-center">
         <div class="col-md-4">
-            <EditForm Model="@Game" FormName="editGame" OnValidSubmit="HandleSubmit">
-                <DataAnnotationsValidator/>
+            <EditForm Model="@Game" FormName="editGame" OnValidSubmit="HandleSubmitAsync">
+                <DataAnnotationsValidator />
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Name:</label>
-                    <InputText class="form-control" id="name" @bind-value="Game.Name"/>
-                    <ValidationMessage For="@(() => Game.Name)"/>
+                    <InputText class="form-control" id="name" @bind-value="Game.Name" />
+                    <ValidationMessage For="@(() => Game.Name)" />
                 </div>
                 <div class="mb-3">
                     <label for="genre" class="form-label">Genre:</label>
@@ -39,16 +39,16 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="price" class="form-label">Price:</label>
-                    <InputNumber step=".01" class="form-control" id="price" @bind-value="Game.Price"/>
-                    <ValidationMessage For="@(() => Game.Price)"/>
+                    <InputNumber step=".01" class="form-control" id="price" @bind-value="Game.Price" />
+                    <ValidationMessage For="@(() => Game.Price)" />
                 </div>
                 <div class="mb-3">
                     <label for="releaseDate" class="form-label">Release Date:</label>
-                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate"/>
+                    <InputDate class="form-control" id="releaseDate" @bind-value="Game.ReleaseDate" />
                 </div>
 
                 <div class="mb-3">
-                    <ValidationSummary/>
+                    <ValidationSummary />
                 </div>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -68,13 +68,13 @@ else
 
     private Genre[]? _genres;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if (Game is not null) return;
 
         if (Id is not null)
         {
-            Game = GamesClient.GetGameById(Id.Value);
+            Game = await GamesClient.GetGameByIdAsync(Id.Value);
             Title = $"Editing {Game.Name}";
         }
         else
@@ -86,27 +86,27 @@ else
             Title = "Add New Game";
         }
 
-        base.OnParametersSet();
+        await base.OnParametersSetAsync();
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _genres = GenresClient.GetGenres();
+        _genres = await GenresClient.GetGenresAsync();
         base.OnInitialized();
     }
 
-    private void HandleSubmit()
+    private async Task HandleSubmitAsync()
     {
         if (Game is null) return;
 
         if (Id is null)
         {
-            GamesClient.AddGame(Game);
+            await GamesClient.AddGameAsync(Game);
         }
         else
         {
             Game.Id = Id.Value;
-            GamesClient.UpdateGame(Game);
+            await GamesClient.UpdateGameAsync(Game);
         }
 
         NavigationManager.NavigateTo("/");
